@@ -25,9 +25,18 @@ const ImageUpload = () => {
   };
 
   return (
-    <div class="container card-body">
-      <input type="file" class=".btn" accept="image/*" onChange={handleFileChange} />
-      <button onClick={handleSubmit} class=".btn">Process Image</button>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card bg-light">
+            <div className="card-body">
+              <h5 className="card-title">Upload Image</h5>
+              <input type="file" className="form-control mb-3" accept="image/*" onChange={handleFileChange} />
+              <button onClick={handleSubmit} className="btn btn-primary">Process Image</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,5 @@
+body {
+    background-image: url(https://media.istockphoto.com/id/490576853/photo/grapevine.jpg?s=612x612&w=0&k=20&c=GM5ihD1jmZdfVvTLk91bY2z00ds3P_6DLji7HISwUbY=);
+    background-size: cover; /* Ensures thee background image covers the entire viewport */
+    background-repeat: no-repeat; /* Prevents the background image from repeating */
+  }
