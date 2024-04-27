@@ -25,9 +25,9 @@ const ImageUpload = () => {
   };
 
   return (
-    <div>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
-      <button onClick={handleSubmit}>Process Image</button>
+    <div class="container card-body">
+      <input type="file" class=".btn" accept="image/*" onChange={handleFileChange} />
+      <button onClick={handleSubmit} class=".btn">Process Image</button>
     </div>
   );
 };
