@@ -1,24 +1,22 @@
-import cv2
-import numpy as np
-import matplotlib.pyplot as plt
-import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Dropout, UpSampling2D, concatenate
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.optimizers import Adam
+from model import *
+from data import *
+import time
+data_gen_args=dict()
+model=unet()
+model_weight_link="https://drive.google.com/file/d/1H3tZ0DBRPXLkAjwn7SC1Og059ktZI1Lv/view?usp=sharing"
+model.load_weights(model_weight_link)
 
-# he U-Net model
-
-# Load the model
-model = load_model("unet_rgb_256.hdf5")
-# model.load_weights("unet_rgb_256.hdf5")
-
-img_path=r'C:\Users\sarth\Desktop\ML\DL_Hackathon\Unet\Block_1C1_Row_1_Middle_723.png'
-img=cv2.imread(img_path)
-#img = np.transpose(img, (1, 0, 2))
-print(img.shape)
-img=tf.image.resize(img,(256,256))
-img = np.expand_dims(img, axis=0)  # Add batch dimension
-print(img.shape)
-# Predict segmentation mask
-segmented_image = model.predict(img)
-cv2.imwrite('segmented_image.png', segmented_image)
+test_path="path to the test data folder"
+files=os.listdir(test_path+'/images')
+images_no=len(files)
+files.sort()
+testGene = testGenerator(test_path+'/images',as_gray=False)
+begin=time.time()
+results = model.predict_generator(testGene,images_no,verbose=1)
+end=time.time()
+print((end-begin)/images_no,"s for 1 imgs")
+saveResult("results/pred",results)
+for i in range(images_no):
+        img = io.imread(os.path.join(test_path+'/masks',files[i].strip('.png')+'_instanceIds.png'),as_gray = False)
+        img = trans.resize(img,(256,256))
+        io.imsave(os.path.join("results/gt","%d_gt.png"%i),img)
