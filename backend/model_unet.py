@@ -16,7 +16,3 @@ results = model.predict_generator(testGene,images_no,verbose=1)
 end=time.time()
 print((end-begin)/images_no,"s for 1 imgs")
 saveResult("results/pred",results)
-for i in range(images_no):
-        img = io.imread(os.path.join(test_path+'/masks',files[i].strip('.png')+'_instanceIds.png'),as_gray = False)
-        img = trans.resize(img,(256,256))
-        io.imsave(os.path.join("results/gt","%d_gt.png"%i),img)
