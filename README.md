@@ -50,7 +50,7 @@ Here is the link to our
 ## Authors
 
 - [Abhijith Raju Nair](https://github.com/DarthBob112112)
-- [Eshaan Dhamija]()
+- [Eshaan Dhamija](https://github.com/eshaandhamija28)
 - [Ishan Sinha](https://github.com/photondestroyer)
 - [Sarthak Prajapati](https://github.com/07Sarthak)
 - [Siddharth Shainesh](https://github.com/Siddharthmainahihu)
