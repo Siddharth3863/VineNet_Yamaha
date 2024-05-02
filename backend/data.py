@@ -5,7 +5,7 @@ import os
 import glob
 import skimage.io as io
 import skimage.transform as trans
-
+from PIL import Image 
 
 def adjustData(img,mask,flag_multi_class,num_class):
     if(flag_multi_class):
@@ -134,9 +134,19 @@ def geneTrainNpy(image_path,mask_path,flag_multi_class = False,num_class = 2,ima
 
 
 
+def saveResult(save_path, npyfile, flag_multi_class=False, num_class=2):
+    for i, item in enumerate(npyfile):
+        # Convert the data type to uint8
+        img = (item[:, :, 0] * 255).astype(np.uint8)
 
+        # Create a PIL Image
+        img_pil = Image.fromarray(img)
 
-def saveResult(save_path,npyfile,flag_multi_class = False,num_class = 2):
-    for i,item in enumerate(npyfile):
-        img = item[:,:,0]
-        io.imsave(os.path.join(save_path,"%d_predict.png"%i),img)
+        # Convert to RGB if necessary
+        img = img_pil.convert('RGB')
+
+        # Convert the image back to a NumPy array
+        img_np = np.array(img)
+
+        # Save the image
+        io.imsave(os.path.join(save_path, "%d_predict.png" % i), img_np)
