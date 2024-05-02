@@ -20,7 +20,7 @@ model = unet()
 model_checkpoint = ModelCheckpoint('unet_membrane.hdf5', monitor='loss',verbose=1, save_best_only=True)
 model.fit_generator(myGene,steps_per_epoch=300,validation_data=validGene,validation_steps=80,epochs=20,callbacks=[model_checkpoint])
 
-test_path="/scratch/siddharths.scee.iitmandi/vinenet/VineNet/test"
+test_path="path to the test folder"
 files=os.listdir(test_path+'/images')
 files.sort()
 testGene = testGenerator(test_path+'/images',as_gray=False)
