@@ -3,7 +3,7 @@ from data import *
 import time
 data_gen_args=dict()
 model=unet()
-model_weight_link="https://drive.google.com/file/d/1H3tZ0DBRPXLkAjwn7SC1Og059ktZI1Lv/view?usp=sharing"
+model_weight_link="unet_membrane.hdf5"
 model.load_weights(model_weight_link)
 
 test_path="path to the test data folder"
