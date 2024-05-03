@@ -40,6 +40,8 @@ At the **final layer a 1x1 convolution** is used to map each 64- component featu
         **python server.py**
 - Next we have to run the website. For this we open another terminal in the root directory and simply run the command **npm start**. This should redirect us to the website on your Browser.
 - Next we go to the upload tab in the site and select the image we want to upload. The output is generated and you are redirected to another page to view the output.
+- To run the model on pretrained weights please download them from the link given below and save it in the folder backend.
+- [Link to Pretrained Model Weights](https://drive.google.com/file/d/1H3tZ0DBRPXLkAjwn7SC1Og059ktZI1Lv/view?usp=drive_link)
 
 
 ## Documentation
