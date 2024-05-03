@@ -5,6 +5,7 @@ import os
 import glob
 import skimage.io as io
 import skimage.transform as trans
+import warnings
 
 Sky = [128,128,128]
 Building = [128,0,0]
@@ -141,7 +142,9 @@ def saveResult(npyfile,flag_multi_class = False,num_class = 2):
         
         # Convert image to uint8 mode
         img_uint8 = (img_rgb * 255).astype(np.uint8)
+        warnings.filterwarnings("ignore", category=UserWarning)
         io.imsave(os.path.join(save_path, f"{i}_predict.png"), img_uint8)
+        warnings.filterwarnings("default")
         return img_uint8
         
         
