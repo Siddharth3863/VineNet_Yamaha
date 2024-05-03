@@ -1,11 +1,27 @@
 from __future__ import print_function
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np 
 import os
 import glob
 import skimage.io as io
 import skimage.transform as trans
-from PIL import Image 
+
+Sky = [128,128,128]
+Building = [128,0,0]
+Pole = [192,192,128]
+Road = [128,64,128]
+Pavement = [60,40,222]
+Tree = [128,128,0]
+SignSymbol = [192,128,128]
+Fence = [64,64,128]
+Car = [64,0,128]
+Pedestrian = [64,64,0]
+Bicyclist = [0,128,192]
+Unlabelled = [0,0,0]
+
+COLOR_DICT = np.array([Sky, Building, Pole, Road, Pavement,
+                          Tree, SignSymbol, Fence, Car, Pedestrian, Bicyclist, Unlabelled])
+
 
 def adjustData(img,mask,flag_multi_class,num_class):
     if(flag_multi_class):
@@ -37,8 +53,8 @@ def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image
     use the same seed for image_datagen and mask_datagen to ensure the transformation for image and mask is the same
     if you want to visualize the results of generator, set save_to_dir = "your path"
     '''
-    image_datagen = ImageDataGenerator(validation_split=0.2,**aug_dict)
-    mask_datagen = ImageDataGenerator(validation_split=0.2,**aug_dict)
+    image_datagen = ImageDataGenerator(**aug_dict)
+    mask_datagen = ImageDataGenerator(**aug_dict)
     image_generator = image_datagen.flow_from_directory(
         train_path,
         classes = [image_folder],
@@ -46,7 +62,6 @@ def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image
         color_mode = image_color_mode,
         target_size = target_size,
         batch_size = batch_size,
-        subset='training',
         save_to_dir = save_to_dir,
         save_prefix  = image_save_prefix,
         seed = seed)
@@ -57,7 +72,6 @@ def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image
         color_mode = mask_color_mode,
         target_size = target_size,
         batch_size = batch_size,
-        subset='training',
         save_to_dir = save_to_dir,
         save_prefix  = mask_save_prefix,
         seed = seed)
@@ -66,53 +80,18 @@ def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image
         img,mask = adjustData(img,mask,flag_multi_class,num_class)
         yield (img,mask)
 
-def validationGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image_color_mode = "grayscale",
-                    mask_color_mode = "grayscale",image_save_prefix  = "image",mask_save_prefix  = "mask",
-                    flag_multi_class = False,num_class = 2,save_to_dir = None,target_size = (256,256),seed = 1):
-    '''
-    can generate image and mask at the same time
-    use the same seed for image_datagen and mask_datagen to ensure the transformation for image and mask is the same
-    if you want to visualize the results of generator, set save_to_dir = "your path"
-    '''
-    image_datagen = ImageDataGenerator(validation_split=0.2,**aug_dict)
-    mask_datagen = ImageDataGenerator(validation_split=0.2,**aug_dict)
-    image_generator = image_datagen.flow_from_directory(
-        train_path,
-        classes = [image_folder],
-        class_mode = None,
-        color_mode = image_color_mode,
-        target_size = target_size,
-        batch_size = batch_size,
-        subset='validation',
-        save_to_dir = save_to_dir,
-        save_prefix  = image_save_prefix,
-        seed = seed)
-    mask_generator = mask_datagen.flow_from_directory(
-        train_path,
-        classes = [mask_folder],
-        class_mode = None,
-        color_mode = mask_color_mode,
-        target_size = target_size,
-        batch_size = batch_size,
-        subset='validation',
-        save_to_dir = save_to_dir,
-        save_prefix  = mask_save_prefix,
-        seed = seed)
-    train_generator = zip(image_generator, mask_generator)
-    for (img,mask) in train_generator:
-        img,mask = adjustData(img,mask,flag_multi_class,num_class)
-        yield (img,mask)
+
 
 def testGenerator(test_path,num_image = 30,target_size = (256, 256),flag_multi_class = False,as_gray = True):
-    files=os.listdir(test_path)
-    files.sort()
+    # files=os.listdir(test_path)
+    # files.sort()
     for i in range(num_image):
-        img = io.imread(os.path.join(test_path,files[i]),as_gray = as_gray)
+        img = io.imread(test_path,as_gray = as_gray)
         img = img / 255
         img = trans.resize(img,target_size)
         # img = np.reshape(img,img.shape+(1,)) if (not flag_multi_class) else img
         img = np.reshape(img,(1,)+img.shape)
-        yield img
+        yield (img,)
 
 
 def geneTrainNpy(image_path,mask_path,flag_multi_class = False,num_class = 2,image_prefix = "image",mask_prefix = "mask",image_as_gray = True,mask_as_gray = True):
@@ -132,21 +111,38 @@ def geneTrainNpy(image_path,mask_path,flag_multi_class = False,num_class = 2,ima
     return image_arr,mask_arr
 
 
+def labelVisualize(num_class,color_dict,img):
+    img = img[:,:,0] if len(img.shape) == 3 else img
+    img_out = np.zeros(img.shape + (3,))
+    for i in range(num_class):
+        img_out[img == i,:] = color_dict[i]
+    return img_out / 255
 
 
-def saveResult(save_path, npyfile, flag_multi_class=False, num_class=2):
-    for i, item in enumerate(npyfile):
-        # Convert the data type to uint8
-        img = (item[:, :, 0] * 255).astype(np.uint8)
 
-        # Create a PIL Image
-        img_pil = Image.fromarray(img)
+def saveResult(npyfile,flag_multi_class = False,num_class = 2):
 
-        # Convert to RGB if necessary
-        img = img_pil.convert('RGB')
+    save_path = '../src'
+    
+    if not os.path.exists(save_path):
+            os.makedirs(save_path)
+            os.chmod(save_path, 0o777)
 
-        # Convert the image back to a NumPy array
-        img_np = np.array(img)
 
-        # Save the image
-        io.imsave(os.path.join(save_path, "%d_predict.png" % i), img_np)
+    for i,img in enumerate(npyfile):
+        if img.ndim == 2:
+            # Convert grayscale image to RGB
+            img_rgb = color.gray2rgb(img)
+        elif img.shape[-1] == 1:
+            # Duplicate single channel to create RGB image
+            img_rgb = np.repeat(img, 3, axis=-1)
+        else:
+            img_rgb = img
+        
+        # Convert image to uint8 mode
+        img_uint8 = (img_rgb * 255).astype(np.uint8)
+        io.imsave(os.path.join(save_path, f"{i}_predict.png"), img_uint8)
+        return img_uint8
+        
+        
+        
