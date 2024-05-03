@@ -22,9 +22,9 @@ const ImageUpload = () => {
         if (!response.ok) {
             throw new Error('Failed to process image');
         }
-        const data = await response.json();
-        // Redirect to the ImageView page passing the image URL as a parameter
-        console.log('Received URL:', data.imageUrl);
+        // const data = await response.json();
+        // // Redirect to the ImageView page passing the image URL as a parameter
+        // console.log('Received URL:', data.imageUrl);
         window.location.href = `/display`;
     } catch (error) {
         console.error('Error:', error);
